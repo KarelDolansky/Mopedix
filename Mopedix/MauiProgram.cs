@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Plugin.BLE;
+using Plugin.BLE.Abstractions.Contracts;
 
 namespace Mopedix
 {
@@ -16,8 +18,12 @@ namespace Mopedix
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
+
+            // Register BLE services
+            builder.Services.AddSingleton<IBluetoothLE>(CrossBluetoothLE.Current);
+            builder.Services.AddSingleton<IAdapter>(CrossBluetoothLE.Current.Adapter);
 
             return builder.Build();
         }

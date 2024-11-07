@@ -1,25 +1,26 @@
-﻿namespace Mopedix
+﻿using Plugin.BLE.Abstractions.Contracts;
+using System.Collections.ObjectModel;
+
+namespace Mopedix
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        private readonly BleService _bleService;
 
-        public MainPage()
+        public ObservableCollection<IDevice> Devices { get; private set; }
+
+        public MainPage(BleService bleService)
         {
             InitializeComponent();
+            _bleService = bleService;
+            Devices = _bleService.Devices;
+            BindingContext = this;
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        protected override async void OnAppearing()
         {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            base.OnAppearing();
+            await _bleService.ScanForDevicesAsync();
         }
     }
-
 }

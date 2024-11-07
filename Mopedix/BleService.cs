@@ -1,27 +1,32 @@
 ﻿using Plugin.BLE.Abstractions.Contracts;
+using Plugin.BLE.Abstractions.EventArgs;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 public class BleService
 {
-    private readonly IBluetoothLE _bluetoothLE;
-    private readonly IAdapter _adapter;
-
     public ObservableCollection<IDevice> Devices { get; private set; }
+    private readonly IAdapter _adapter;
 
     public BleService(IBluetoothLE bluetoothLE, IAdapter adapter)
     {
-        _bluetoothLE = bluetoothLE;
         _adapter = adapter;
         Devices = new ObservableCollection<IDevice>();
+
+        _adapter.DeviceDiscovered += OnDeviceDiscovered;
+    }
+
+    private void OnDeviceDiscovered(object sender, DeviceEventArgs e)
+    {
+        if (!Devices.Contains(e.Device))
+        {
+            Devices.Add(e.Device);
+        }
     }
 
     public async Task ScanForDevicesAsync()
     {
-        if (_bluetoothLE.State == BluetoothState.On)
-        {
-            _adapter.DeviceDiscovered += (s, a) => Devices.Add(a.Device);
-            await _adapter.StartScanningForDevicesAsync();
-        }
+        Devices.Clear();
+        await _adapter.StartScanningForDevicesAsync();
     }
 }

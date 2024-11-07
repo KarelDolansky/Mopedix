@@ -1,12 +1,17 @@
-﻿namespace Mopedix
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Mopedix
 {
     public partial class App : Application
     {
-        public App()
+        private readonly IServiceProvider _serviceProvider;
+
+        public App(IServiceProvider serviceProvider)
         {
             InitializeComponent();
-
-            MainPage = new AppShell();
+            _serviceProvider = serviceProvider;
+            var mainPage = _serviceProvider.GetRequiredService<MainPage>();
+            MainPage = new NavigationPage(mainPage);
         }
     }
 }

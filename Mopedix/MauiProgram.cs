@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui;
+using Microsoft.Maui.Hosting;
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
 
@@ -14,16 +16,13 @@ namespace Mopedix
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-#if DEBUG
-            builder.Logging.AddDebug();
-#endif
-
-            // Register BLE services
+            // Register services
             builder.Services.AddSingleton<IBluetoothLE>(CrossBluetoothLE.Current);
             builder.Services.AddSingleton<IAdapter>(CrossBluetoothLE.Current.Adapter);
+            builder.Services.AddSingleton<BleService>();
+            builder.Services.AddSingleton<MainPage>();
 
             return builder.Build();
         }
